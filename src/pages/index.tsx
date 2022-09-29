@@ -1,7 +1,33 @@
-import type { NextPage } from 'next';
+import { GetServerSideProps } from 'next';
+import Stripe from 'stripe';
 
-const Home: NextPage = () => {
-  return <h1 className="text-3xl font-bold underline">Hello world!</h1>;
+export const getServerSideProps: GetServerSideProps = async () => {
+  const stripe = await new Stripe(process.env.STRIPE_SECRET_KEY as string, {
+    apiVersion: '2022-08-01',
+  });
+
+  const prices = await stripe.prices.list({
+    limit: 10,
+    expand: ['data.product'],
+  });
+
+  return { props: { prices: prices.data } };
 };
 
-export default Home;
+interface IPrice extends Stripe.Price {
+  product: Stripe.Product;
+}
+
+interface IProps {
+  prices: IPrice[];
+}
+
+export default function Home({ prices }: IProps) {
+  return (
+    <div>
+      {prices.map((price) => (
+        <h1 key={price.id}>{price.product.name}</h1>
+      ))}
+    </div>
+  );
+}
