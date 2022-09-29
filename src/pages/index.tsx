@@ -1,4 +1,5 @@
 import { GetServerSideProps } from 'next';
+import Link from 'next/link';
 import Stripe from 'stripe';
 
 export const getServerSideProps: GetServerSideProps = async () => {
@@ -27,11 +28,16 @@ export default function Home({ prices }: IProps) {
     <div>
       {prices.map((price) => (
         <>
-          <img
-            src={price.product.images[0]}
-            alt={price.product.name}
-            className="h-64 w-64"
-          />
+          <Link
+            href={`/product/[product]?product?=${price.product.id}`}
+            as={`/product/${price.product.id}`}
+          >
+            <img
+              src={price.product.images[0]}
+              alt={price.product.name}
+              className="h-64 w-64"
+            />
+          </Link>
           <div className="flex items-center">
             <h1 className="text-xl" key={price.id}>
               {price.product.name}
